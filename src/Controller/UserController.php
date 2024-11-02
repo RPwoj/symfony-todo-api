@@ -9,6 +9,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\UserRepository;
 use App\Entity\User;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 
 class UserController extends AbstractController
@@ -37,11 +39,11 @@ class UserController extends AbstractController
     // }
 
     #[Route('/user/register/', methods: ['POST'])]
-    public function register(UserRepository $userRepository, Request $request, EntityManagerInterface $entityManager): JsonResponse
+    public function register(UserRepository $userRepository, Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher): JsonResponse
     {
         $email = $request->query->get('email');
         // $name = $request->query->get('name');
-        $password = $request->query->get('password');
+        $plainTextPassword = $request->query->get('password');
         $repeatedPassword = $request->query->get('repeat_password');
 
         // $this->res['email'] = $email;
@@ -50,22 +52,53 @@ class UserController extends AbstractController
         // $this->res['repeatedPassword'] = $repeatedPassword;
 
 
-        if ($email && $password && $repeatedPassword) {
+        if ($email && $plainTextPassword && $repeatedPassword) {
 
             /* To add function to check if is password strong */
-            if ($password == $repeatedPassword) {
+            if ($plainTextPassword == $repeatedPassword) {
                 /* check if user exists */
+
                 if (!$userRepository->findOneBy(array('email' => $email))) {
                     $user = new User();
                     $user->setEmail($email);
                     // $user->setName($name);
-                    $user->setPassword($password);
+
+                    $hashedPassword = $passwordHasher->hashPassword($user, $plainTextPassword);
+                    $user->setPassword($hashedPassword);
+
                     $user->setRoles(['ROLE_USER']);
                     $entityManager->persist($user);
                     $entityManager->flush();
 
                     $this->res['info'] = 'Registered new user with id: ' . $user->getId();
                 }
+            }
+            
+        } else {
+            $this->res['error'] = 'too few data';
+        }
+
+        return new JsonResponse($this->res);
+    }
+
+    #[Route('/user/login/', methods: ['POST'])]
+    public function login(UserRepository $userRepository, Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher): JsonResponse
+    {
+        $email = $request->query->get('email');
+        $plainTextPassword = $request->query->get('password');
+
+        // $this->res['email'] = $email;
+        // $this->res['name'] = $name;
+        // $this->res['password'] = $password;
+        // $this->res['repeatedPassword'] = $repeatedPassword;
+
+        if ($email && $plainTextPassword) {
+            $user = $userRepository->findOneBy(array('email' => $email));
+
+            if ($user && $passwordHasher->isPasswordValid($user, $plainTextPassword)) {
+                $this->res['info'] ='User logged in';
+            } else {
+                $this->res['info'] = 'Wrong email or password';
             }
             
         } else {
