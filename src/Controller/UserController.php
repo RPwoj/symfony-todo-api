@@ -29,14 +29,14 @@ class UserController extends AbstractController
         return new JsonResponse($this->res);
     }
 
-    // #[Route('/task/{taskID}', methods: ['GET'])]
-    // public function show(TaskRepository $taskRepository, int $taskID): JsonResponse
-    // {
-    //     $task = $taskRepository->find($taskID);
-    //     $this->res['task_name'] = $task->getName();
+    #[Route('/api/user/{id}', methods: ['GET'])]
+    public function show(UserRepository $userRepository, int $id): JsonResponse
+    {
+        $user = $userRepository->find($id);
+        $this->res['user_email'] = $user->getEmail();
 
-    //     return new JsonResponse($this->res);
-    // }
+        return new JsonResponse($this->res);
+    }
 
     #[Route('/api/register/', methods: ['POST'])]
     public function register(UserRepository $userRepository, Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher): JsonResponse
