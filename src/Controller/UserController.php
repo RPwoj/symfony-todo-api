@@ -17,7 +17,7 @@ class UserController extends AbstractController
 {
     public $res = [];
 
-    #[Route('/users/', methods: ['GET'])]
+    #[Route('/api/users/', methods: ['GET'])]
     public function showAll(UserRepository $userRepository): JsonResponse
     {
         $users = $userRepository->findAll();
@@ -38,7 +38,7 @@ class UserController extends AbstractController
     //     return new JsonResponse($this->res);
     // }
 
-    #[Route('/user/register/', methods: ['POST'])]
+    #[Route('/api/register/', methods: ['POST'])]
     public function register(UserRepository $userRepository, Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher): JsonResponse
     {
         $email = $request->query->get('email');
