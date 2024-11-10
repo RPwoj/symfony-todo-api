@@ -17,7 +17,7 @@ class TaskController extends AbstractController
 {
     public $res = [];
 
-    #[Route('/tasks/', methods: ['GET'])]
+    #[Route('/api/tasks/', methods: ['GET'])]
     public function showAll(TaskRepository $taskRepository): JsonResponse
     {
         $tasks = $taskRepository->findAll();
@@ -29,7 +29,7 @@ class TaskController extends AbstractController
         return new JsonResponse($this->res);
     }
 
-    #[Route('/task/{taskID}', methods: ['GET'])]
+    #[Route('/api/task/{taskID}', methods: ['GET'])]
     public function show(TaskRepository $taskRepository, int $taskID): JsonResponse
     {
         $task = $taskRepository->find($taskID);
@@ -38,7 +38,7 @@ class TaskController extends AbstractController
         return new JsonResponse($this->res);
     }
 
-    #[Route('/task/', methods: ['POST'])]
+    #[Route('/api/task/', methods: ['POST'])]
     public function create(EntityManagerInterface $entityManager, GroupTaskRepository $groupTaskRepository, Request $request): JsonResponse
     {
         $name = $request->query->get('name');
@@ -63,7 +63,7 @@ class TaskController extends AbstractController
         return new JsonResponse($this->res);
     }
 
-    #[Route('/task/{taskID}', methods: ['PATCH'])]
+    #[Route('/api/task/{taskID}', methods: ['PATCH'])]
     public function edit(EntityManagerInterface $entityManager, Request $request, TaskRepository $taskRepository, int $taskID): Response
     {
         $newName = $request->query->get('new_name');
@@ -84,7 +84,7 @@ class TaskController extends AbstractController
         return new JsonResponse($this->res);
     }
 
-    #[Route('/task/{taskID}', methods: ['DELETE'])]
+    #[Route('/api/task/{taskID}', methods: ['DELETE'])]
     public function delete(EntityManagerInterface $entityManager, TaskRepository $taskRepository, int $taskID): Response
     {
         if ($taskID) {

@@ -51,13 +51,11 @@ class UserController extends AbstractController
         // $this->res['password'] = $password;
         // $this->res['repeatedPassword'] = $repeatedPassword;
 
-
         if ($email && $plainTextPassword && $repeatedPassword) {
 
             /* To add function to check if is password strong */
             if ($plainTextPassword == $repeatedPassword) {
                 /* check if user exists */
-
                 if (!$userRepository->findOneBy(array('email' => $email))) {
                     $user = new User();
                     $user->setEmail($email);
@@ -81,46 +79,19 @@ class UserController extends AbstractController
         return new JsonResponse($this->res);
     }
 
-    #[Route('/user/login/', methods: ['POST'])]
-    public function login(UserRepository $userRepository, Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher): JsonResponse
-    {
-        $email = $request->query->get('email');
-        $plainTextPassword = $request->query->get('password');
-
-        // $this->res['email'] = $email;
-        // $this->res['name'] = $name;
-        // $this->res['password'] = $password;
-        // $this->res['repeatedPassword'] = $repeatedPassword;
-
-        if ($email && $plainTextPassword) {
-            $user = $userRepository->findOneBy(array('email' => $email));
-
-            if ($user && $passwordHasher->isPasswordValid($user, $plainTextPassword)) {
-                $this->res['info'] ='User logged in';
-            } else {
-                $this->res['info'] = 'Wrong email or password';
-            }
-            
-        } else {
-            $this->res['error'] = 'too few data';
-        }
-
-        return new JsonResponse($this->res);
-    }
-
-    // #[Route('/task/{taskID}', methods: ['PATCH'])]
-    // public function edit(EntityManagerInterface $entityManager, Request $request, TaskRepository $taskRepository, int $taskID): Response
+    // #[Route('/api/user/{id}', methods: ['PATCH'])]
+    // public function edit(EntityManagerInterface $entityManager, Request $request, UserRepository $userRepository, int $id): Response
     // {
-    //     $newName = $request->query->get('new_name');
+    //     $somethingNew = $request->query->get('new_name');
 
-    //     if ($taskID && $newName) {
-    //         $task = $taskRepository->find($taskID);
+    //     if ($userID && $somethingNew) {
+    //         $user = $userRepository->find($userID);
 
-    //         $task->setName($newName);
-    //         $entityManager->persist($task);
+    //         $user->setSomethingNew($somethingNew);
+    //         $entityManager->persist($user);
     //         $entityManager->flush();
 
-    //         $this->res['info'] = "Task with id {$taskID} has new name: {$newName}";
+    //         $this->res['info'] = "User with id {$userID} has new something: {$somethingNew}";
 
     //     } else {
     //         $this->res['error'] = 'too few data';
@@ -129,16 +100,16 @@ class UserController extends AbstractController
     //     return new JsonResponse($this->res);
     // }
 
-    // #[Route('/task/{taskID}', methods: ['DELETE'])]
-    // public function delete(EntityManagerInterface $entityManager, TaskRepository $taskRepository, int $taskID): Response
+    // #[Route('/api/user/{id}', methods: ['DELETE'])]
+    // public function delete(EntityManagerInterface $entityManager, UserRepository $userRepository, int $userID): Response
     // {
-    //     if ($taskID) {
-    //         $task = $taskRepository->find($taskID);
+    //     if ($userID) {
+    //         $user = $userRepository->find($userID);
 
-    //         $entityManager->remove($task);
+    //         $entityManager->remove($user);
     //         $entityManager->flush();
 
-    //         $this->res['info'] = "task with id {$taskID} deleted!";
+    //         $this->res['info'] = "user with id {$userID} deleted!";
         
     //     } else {
     //         $this->res['error'] = 'too few data';
